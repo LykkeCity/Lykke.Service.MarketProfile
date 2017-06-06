@@ -5,17 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Lykke.Common" Version="1.1.69" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="1.1.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Lykke.AssetsApi.Core\Lykke.AssetsApi.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Lykke.Common">
-      <HintPath>C:\Users\krya\.nuget\packages\lykke.common\1.1.69\lib\netstandard1.6\Lykke.Common.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>
