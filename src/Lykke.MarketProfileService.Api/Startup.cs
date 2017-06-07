@@ -78,7 +78,8 @@ namespace Lykke.MarketProfileService.Api
                 QueueName = settings.SlackNotifications.AzureQueue.QueueName
             }, log);
 
-            if (!string.IsNullOrEmpty(appSettings.Db.LogsConnectionString))
+            if (!string.IsNullOrEmpty(appSettings.Db.LogsConnectionString) && 
+                !(appSettings.Db.LogsConnectionString.StartsWith("${") && appSettings.Db.LogsConnectionString.EndsWith("}")))
             {
                 log = new LykkeLogToAzureStorage("Lykke.MarketProfileService", new AzureTableStorage<LogEntity>(
                     appSettings.Db.LogsConnectionString, "MarketProfileServiceLogs", log), slackService);

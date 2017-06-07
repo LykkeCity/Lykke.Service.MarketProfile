@@ -1,11 +1,10 @@
 ﻿using Autofac;
-using AzureStorage.Tables;
+using AzureStorage.Blob;
 using Common.Log;
 using Lykke.MarketProfileService.Core;
 using Lykke.MarketProfileService.Core.Domain;
 using Lykke.MarketProfileService.Core.Services;
 using Lykke.MarketProfileService.Repositories;
-using Lykke.MarketProfileService.Repositories.Entities;
 using Lykke.MarketProfileService.Services;
 
 namespace Lykke.MarketProfileService.Api.DependencyInjection
@@ -29,8 +28,9 @@ namespace Lykke.MarketProfileService.Api.DependencyInjection
 
             builder.Register<IAssetPairsRepository>(
                 x => new AssetPairRepository(
-                    new AzureTableStorage<AssetPairEntity>(_settings.Db.CachePersistenceConnectionString,
-                        "AssetPairs", null)));
+                        new AzureBlobStorage(_settings.Db.CachePersistenceConnectionString),
+                        "AssetPairs",
+                        "Instance"));
 
             builder.RegisterType<AssetPairsCacheService>().As<IAssetPairsCacheService>();
 

@@ -69,7 +69,7 @@ namespace Lykke.MarketProfileService.Services
             {
                 var pairs = _cacheService.GetAll();
 
-                await _repository.AddOrUpdateAllAsync(pairs);
+                await _repository.Write(pairs);
             }
             catch (Exception ex)
             {
@@ -79,7 +79,7 @@ namespace Lykke.MarketProfileService.Services
 
         private async Task UpdateCache()
         {
-            var pairs = await _repository.GetAllAsync();
+            var pairs = await _repository.Read();
 
             _cacheService.InitCache(pairs);
         }

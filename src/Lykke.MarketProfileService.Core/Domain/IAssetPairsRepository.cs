@@ -5,8 +5,7 @@ namespace Lykke.MarketProfileService.Core.Domain
 {
     public interface IAssetPairsRepository
     {
-        Task AddAsync(IAssetPair pair);
-        Task<IEnumerable<IAssetPair>> GetAllAsync();
-        Task AddOrUpdateAllAsync(IEnumerable<IAssetPair> pairs);
+        Task<IEnumerable<IAssetPair>> Read();
+        Task Write(IEnumerable<IAssetPair> pairs);
     }
 }

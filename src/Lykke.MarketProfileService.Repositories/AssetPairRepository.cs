@@ -1,38 +1,45 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using AzureStorage;
 using Common;
 using Lykke.MarketProfileService.Core.Domain;
-using Lykke.MarketProfileService.Repositories.Entities;
+using Newtonsoft.Json;
 
 namespace Lykke.MarketProfileService.Repositories
 {
     public class AssetPairRepository : IAssetPairsRepository
     {
-        private readonly INoSQLTableStorage<AssetPairEntity> _tableStorage;
+        private readonly string _container;
+        private readonly string _key;
+        private readonly IBlobStorage _storage;
 
-        public AssetPairRepository(INoSQLTableStorage<AssetPairEntity> tableStorage)
+        public AssetPairRepository(IBlobStorage storage, string container, string key)
         {
-            _tableStorage = tableStorage;
+            _container = container;
+            _key = key;
+            _storage = storage;
         }
 
-        public async Task AddAsync(IAssetPair pair)
+        public async Task<IEnumerable<IAssetPair>> Read()
         {
-            await _tableStorage.InsertOrReplaceAsync(AssetPairEntity.Create(pair));
-        }
-
-        public async Task<IEnumerable<IAssetPair>> GetAllAsync()
-        {
-            return (await _tableStorage.GetDataAsync()).Select(AssetPair.Create);
-        }
-
-        public async Task AddOrUpdateAllAsync(IEnumerable<IAssetPair> pairs)
-        {
-            foreach (var chunk in pairs.ToChunks(50))
+            if (_storage.HasBlobAsync(_container, _key).Result)
             {
-                await _tableStorage.InsertOrReplaceBatchAsync(chunk.Select(AssetPairEntity.Create));
+                var data = await _storage.GetAsync(_container, _key);
+                var content = Encoding.UTF8.GetString(data.ToBytes());
+
+                return JsonConvert.DeserializeObject<AssetPair[]>(content);
             }
+
+            return Enumerable.Empty<IAssetPair>();
+        }
+
+        public async Task Write(IEnumerable<IAssetPair> pairs)
+        {
+            var data = JsonConvert.SerializeObject(pairs).ToUtf8Bytes();
+
+            await _storage.SaveBlobAsync(_container, _key, data);
         }
     }
 }
