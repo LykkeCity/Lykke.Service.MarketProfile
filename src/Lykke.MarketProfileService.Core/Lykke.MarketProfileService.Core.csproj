@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.6.0" />
     <PackageReference Include="Lykke.Domain.Prices" Version="0.9.0" />
   </ItemGroup>
 

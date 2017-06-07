@@ -5,10 +5,6 @@ VisualStudioVersion = 15.0.26430.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Repositories", "2. Repositories", "{BC9B57CF-FA41-4465-9ADC-0C7F157A6551}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Submodules", "3. Submodules", "{5417B955-A1DD-4CCD-A050-2AA03BA7EADB}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureRepositories.Candles", "submodules\AzureRepositories.Candles\src\AzureRepositories.Candles\AzureRepositories.Candles.csproj", "{F3B1C00B-9FF9-440A-A169-E99ED58AE6D7}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Core", "1. Core", "{581E3EC8-671D-4F95-9762-7AE70BA3BABF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lykke.MarketProfileService.Core", "src\Lykke.MarketProfileService.Core\Lykke.MarketProfileService.Core.csproj", "{4D259D9A-6C00-4964-94BA-5B14CBF22B75}"
@@ -25,10 +21,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F3B1C00B-9FF9-440A-A169-E99ED58AE6D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F3B1C00B-9FF9-440A-A169-E99ED58AE6D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F3B1C00B-9FF9-440A-A169-E99ED58AE6D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F3B1C00B-9FF9-440A-A169-E99ED58AE6D7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4D259D9A-6C00-4964-94BA-5B14CBF22B75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4D259D9A-6C00-4964-94BA-5B14CBF22B75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D259D9A-6C00-4964-94BA-5B14CBF22B75}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -50,7 +42,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{F3B1C00B-9FF9-440A-A169-E99ED58AE6D7} = {5417B955-A1DD-4CCD-A050-2AA03BA7EADB}
 		{4D259D9A-6C00-4964-94BA-5B14CBF22B75} = {581E3EC8-671D-4F95-9762-7AE70BA3BABF}
 		{75517C96-8815-4113-A8CE-6A883815D28B} = {581E3EC8-671D-4F95-9762-7AE70BA3BABF}
 		{2D5583CC-9832-42A1-B80D-54E7A9412267} = {BC9B57CF-FA41-4465-9ADC-0C7F157A6551}

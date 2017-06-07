@@ -41,7 +41,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\AzureRepositories.Candles\src\AzureRepositories.Candles\AzureRepositories.Candles.csproj" />
     <ProjectReference Include="..\Lykke.MarketProfileService.Core\Lykke.MarketProfileService.Core.csproj" />
     <ProjectReference Include="..\Lykke.MarketProfileService.Repositories\Lykke.MarketProfileService.Repositories.csproj" />
     <ProjectReference Include="..\Lykke.MarketProfileService.Services\Lykke.MarketProfileService.Services.csproj" />

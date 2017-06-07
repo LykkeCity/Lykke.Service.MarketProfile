@@ -8,11 +8,7 @@ namespace Lykke.MarketProfileService.Api
         public static void Main(string[] args)
         {
             var host = new WebHostBuilder()
-                .UseKestrel(options =>
-                {
-                    // TODO: Check all code for thread safety and remove it
-                    options.ThreadCount = 1;
-                })
+                .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseUrls("http://*:5000")

@@ -64,8 +64,6 @@ namespace Lykke.MarketProfileService.Api
 
             var appSettings = Configuration["SettingsUrl"].GetJsonAsync<ApplicationSettings>().Result;
 
-            ApiServicesRegistration.Register(appSettings, services);
-
             var builder = new ContainerBuilder();
 
             builder.RegisterModule(new ApiModule(appSettings));
