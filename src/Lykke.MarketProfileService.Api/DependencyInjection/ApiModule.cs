@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using AzureStorage.Tables;
+using Common.Log;
 using Lykke.MarketProfileService.Core;
 using Lykke.MarketProfileService.Core.Domain;
 using Lykke.MarketProfileService.Core.Services;
@@ -11,21 +12,24 @@ namespace Lykke.MarketProfileService.Api.DependencyInjection
 {
     public class ApiModule : Module
     {
-        private readonly ApplicationSettings _settings;
+        private readonly ApplicationSettings.MarketProfileServiceSettings _settings;
+        private readonly ILog _log;
 
-        public ApiModule(ApplicationSettings settings)
+        public ApiModule(ApplicationSettings.MarketProfileServiceSettings settings, ILog log)
         {
             _settings = settings;
+            _log = log;
         }
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterInstance(_settings)
-                .SingleInstance();
+            builder.RegisterInstance(_log).SingleInstance();
+
+            builder.RegisterInstance(_settings).SingleInstance();
 
             builder.Register<IAssetPairsRepository>(
                 x => new AssetPairRepository(
-                    new AzureTableStorage<AssetPairEntity>(_settings.MarketProfileService.Db.ConnectionString,
+                    new AzureTableStorage<AssetPairEntity>(_settings.Db.CachePersistenceConnectionString,
                         "AssetPairs", null)));
 
             builder.RegisterType<AssetPairsCacheService>().As<IAssetPairsCacheService>();

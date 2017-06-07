@@ -2,6 +2,7 @@
 {
     public enum ErrorCodes
     {
-        InvalidInput = 1
+        InvalidInput = 1,
+        RuntimeProblem
     }
 }

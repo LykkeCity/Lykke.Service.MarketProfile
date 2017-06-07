@@ -1,10 +1,17 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Flurl.Http;
+using AzureStorage.Tables;
+using Common.Log;
+using Lykke.AzureQueueIntegration;
+using Lykke.Logs;
 using Lykke.MarketProfileService.Api.DependencyInjection;
+using Lykke.MarketProfileService.Api.Middleware;
 using Lykke.MarketProfileService.Core;
+using Lykke.SettingsReader;
+using Lykke.SlackNotification.AzureQueue;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -17,7 +24,7 @@ namespace Lykke.MarketProfileService.Api
 {
     public class Startup
     {
-        public IHostingEnvironment Environment { get; }
+        public IHostingEnvironment HostingEnvironment { get; }
         public IContainer ApplicationContainer { get; set; }
 
         public Startup(IHostingEnvironment env)
@@ -29,7 +36,7 @@ namespace Lykke.MarketProfileService.Api
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
 
-            Environment = env;
+            HostingEnvironment = env;
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -37,6 +44,8 @@ namespace Lykke.MarketProfileService.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            ILog log = new LogToConsole();
+
             services.AddMvc()
                 .AddJsonOptions(options =>
                 {
@@ -60,13 +69,24 @@ namespace Lykke.MarketProfileService.Api
                 options.IncludeXmlComments(xmlPath);
             });
 
-            services.AddMemoryCache();
+            var settings = LoadSettings();
+            var appSettings = settings.MarketProfileService;
 
-            var appSettings = Configuration["SettingsUrl"].GetJsonAsync<ApplicationSettings>().Result;
+            var slackService = services.UseSlackNotificationsSenderViaAzureQueue(new AzureQueueSettings
+            {
+                ConnectionString = settings.SlackNotifications.AzureQueue.ConnectionString,
+                QueueName = settings.SlackNotifications.AzureQueue.QueueName
+            }, log);
+
+            if (!string.IsNullOrEmpty(appSettings.Db.LogsConnectionString))
+            {
+                log = new LykkeLogToAzureStorage("Lykke.MarketProfileService", new AzureTableStorage<LogEntity>(
+                    appSettings.Db.LogsConnectionString, "MarketProfileServiceLogs", log), slackService);
+            }
 
             var builder = new ContainerBuilder();
 
-            builder.RegisterModule(new ApiModule(appSettings));
+            builder.RegisterModule(new ApiModule(appSettings, log));
             builder.Populate(services);
 
             ApplicationContainer = builder.Build();
@@ -74,11 +94,33 @@ namespace Lykke.MarketProfileService.Api
             return new AutofacServiceProvider(ApplicationContainer);
         }
 
+        private static ApplicationSettings LoadSettings()
+        {
+            var settingsUrl = Environment.GetEnvironmentVariable("SettingsUrl");
+
+            if (string.IsNullOrEmpty(settingsUrl))
+            {
+                throw new Exception("HostingEnvironment variable 'SettingsUrl' is not defined");
+            }
+
+            using (var httpClient = new HttpClient())
+            {
+                using (var response = httpClient.GetAsync(settingsUrl).Result)
+                {
+                    var settingsData = response.Content.ReadAsStringAsync().Result;
+
+                    return SettingsProcessor.Process<ApplicationSettings>(settingsData);
+                }
+            }
+        }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            app.UseMiddleware<GlobalErrorHandlerMiddleware>();
 
             app.UseMvc();
             app.UseSwagger();
