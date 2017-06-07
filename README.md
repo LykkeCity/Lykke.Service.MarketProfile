@@ -1,2 +1,2 @@
-# Lykke.AssetsApi
-Provide real time asset rates, and related information
+# Lykke.MarketProfileService
+Provide real time asset rates
