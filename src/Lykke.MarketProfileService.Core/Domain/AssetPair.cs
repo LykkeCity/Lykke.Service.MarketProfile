@@ -1,4 +1,5 @@
 ﻿using System;
+using Lykke.Domain.Prices.Contracts;
 
 namespace Lykke.MarketProfileService.Core.Domain
 {
@@ -9,6 +10,42 @@ namespace Lykke.MarketProfileService.Core.Domain
         public double AskPrice { get; set; }
         public DateTime BidPriceTimestamp { get; set; }
         public DateTime AskPriceTimestamp { get; set; }
+
+        public IAssetPair ProcessQuote(IQuote quote)
+        {
+            if (quote.IsBuy)
+            {
+                if (BidPriceTimestamp < quote.Timestamp)
+                {
+                    BidPrice = quote.Price;
+                    BidPriceTimestamp = quote.Timestamp;
+                }
+            }
+            else
+            {
+                if (AskPriceTimestamp < quote.Timestamp)
+                {
+                    AskPrice = quote.Price;
+                    AskPriceTimestamp = quote.Timestamp;
+                }
+            }
+
+            return this;
+        }
+
+        public static AssetPair Create(IQuote quote)
+        {
+            var pair = new AssetPair
+            {
+                Code = quote.AssetPair,
+                AskPriceTimestamp = DateTime.MinValue,
+                BidPriceTimestamp = DateTime.MinValue
+            };
+
+            pair.ProcessQuote(quote);
+
+            return pair;
+        }
 
         public static AssetPair Create(IAssetPair pair)
         {
