@@ -5,6 +5,7 @@ using Lykke.MarketProfileService.Api.Models;
 using Lykke.MarketProfileService.Api.Models.MarketProfile;
 using Lykke.MarketProfileService.Core.Services;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.SwaggerGen.Annotations;
 
 namespace Lykke.MarketProfileService.Api.Controllers
 {
@@ -27,23 +28,25 @@ namespace Lykke.MarketProfileService.Api.Controllers
         }
 
         [HttpGet("{pairCode}")]
-        [ProducesResponseType(typeof(AssetPairModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ResponseModel<AssetPairModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ResponseModel<AssetPairModel>), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ResponseModel<AssetPairModel>), (int)HttpStatusCode.BadRequest)]
         public IActionResult Get(string pairCode)
         {
             if (string.IsNullOrWhiteSpace(pairCode))
             {
-                return BadRequest(new ApiError
-                {
-                    Code = ErrorCodes.InvalidInput,
-                    Msg = "pairCode is required"
-                });
+                return BadRequest(ResponseModel.CreateError<AssetPairModel>(
+                    ErrorCode.InvalidInput,
+                    "Pair code is required"));
             }
 
             var pair = _manager.TryGetPair(pairCode);
 
             if (pair == null)
             {
-                return NotFound();
+                return NotFound(ResponseModel.CreateError<AssetPairModel>(
+                    ErrorCode.PairNotFound,
+                    "Pair not found"));
             }
 
             return Ok(pair.ToApiModel());
