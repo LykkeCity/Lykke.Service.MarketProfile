@@ -28,8 +28,6 @@ namespace Lykke.MarketProfileService.Api.Controllers
 
         [HttpGet("{pairCode}")]
         [ProducesResponseType(typeof(AssetPairModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiError), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult Get(string pairCode)
         {
             if (string.IsNullOrWhiteSpace(pairCode))
