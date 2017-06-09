@@ -1,8 +1,9 @@
 ﻿namespace Lykke.MarketProfileService.Api.Models
 {
-    public enum ErrorCodes
+    public enum ErrorCode
     {
         InvalidInput = 1,
-        RuntimeProblem
+        RuntimeProblem,
+        PairNotFound
     }
 }

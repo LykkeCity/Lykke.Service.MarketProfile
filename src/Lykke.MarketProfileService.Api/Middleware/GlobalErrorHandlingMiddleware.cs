@@ -52,11 +52,7 @@ namespace Lykke.MarketProfileService.Api.Middleware
             ctx.Response.ContentType = "application/json";
             ctx.Response.StatusCode = 500;
 
-            var response = new ApiError
-            {
-                Code = ErrorCodes.RuntimeProblem,
-                Msg = "Technical problems"
-            };
+            var response = ResponseModel.CreateError(ErrorCode.RuntimeProblem, "Technical problems");
 
             await ctx.Response.WriteAsync(response.ToJson());
         }
