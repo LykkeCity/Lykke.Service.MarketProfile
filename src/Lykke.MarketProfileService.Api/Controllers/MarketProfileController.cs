@@ -28,25 +28,29 @@ namespace Lykke.MarketProfileService.Api.Controllers
         }
 
         [HttpGet("{pairCode}")]
-        [ProducesResponseType(typeof(ResponseModel<AssetPairModel>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ResponseModel<AssetPairModel>), (int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ResponseModel<AssetPairModel>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(AssetPairModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorModel), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ErrorModel), (int)HttpStatusCode.BadRequest)]
         public IActionResult Get(string pairCode)
         {
             if (string.IsNullOrWhiteSpace(pairCode))
             {
-                return BadRequest(ResponseModel.CreateError<AssetPairModel>(
-                    ErrorCode.InvalidInput,
-                    "Pair code is required"));
+                return BadRequest(new ErrorModel
+                {
+                    Code = ErrorCode.InvalidInput,
+                    Message = "Pair code is required"
+                });
             }
 
             var pair = _manager.TryGetPair(pairCode);
 
             if (pair == null)
             {
-                return NotFound(ResponseModel.CreateError<AssetPairModel>(
-                    ErrorCode.PairNotFound,
-                    "Pair not found"));
+                return NotFound(new ErrorModel
+                {
+                    Code = ErrorCode.PairNotFound,
+                    Message  = "Pair not found"
+                });
             }
 
             return Ok(pair.ToApiModel());
