@@ -60,6 +60,7 @@ namespace Lykke.MarketProfileService.Services
             catch (Exception ex)
             {
                 _log.WriteErrorAsync(Constants.ComponentName, null, null, ex).Wait();
+                throw;
             }
         }
 
