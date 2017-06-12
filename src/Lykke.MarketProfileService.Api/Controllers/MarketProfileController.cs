@@ -5,7 +5,6 @@ using Lykke.MarketProfileService.Api.Models;
 using Lykke.MarketProfileService.Api.Models.MarketProfile;
 using Lykke.MarketProfileService.Core.Services;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.SwaggerGen.Annotations;
 
 namespace Lykke.MarketProfileService.Api.Controllers
 {
