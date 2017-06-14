@@ -54,8 +54,7 @@ namespace Lykke.MarketProfileService.Services
                     .SetLogger(_log)
                     .Start();
 
-                _timer = new Timer(PersistCache, null, _settings.CacheSettings.PersistPeriod,
-                    _settings.CacheSettings.PersistPeriod);
+                _timer = new Timer(PersistCache, null, _settings.CacheSettings.PersistPeriod, Timeout.InfiniteTimeSpan);
             }
             catch (Exception ex)
             {
@@ -66,6 +65,8 @@ namespace Lykke.MarketProfileService.Services
 
         private async void PersistCache(object state)
         {
+            _timer.Change(Timeout.Infinite, Timeout.Infinite);
+
             try
             {
                 var pairs = _cacheService.GetAll();
@@ -75,6 +76,10 @@ namespace Lykke.MarketProfileService.Services
             catch (Exception ex)
             {
                 await _log.WriteErrorAsync(Constants.ComponentName, null, null, ex);
+            }
+            finally
+            {
+                _timer.Change(_settings.CacheSettings.PersistPeriod, Timeout.InfiniteTimeSpan);
             }
         }
 
