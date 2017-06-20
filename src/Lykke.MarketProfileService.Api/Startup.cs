@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Net.Http;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AzureStorage.Tables;
@@ -69,7 +68,7 @@ namespace Lykke.MarketProfileService.Api
                 options.IncludeXmlComments(xmlPath);
             });
 
-            var settings = LoadSettings();
+            var settings = HttpSettingsLoader.Load<ApplicationSettings>();
             var appSettings = settings.MarketProfileService;
 
             var slackService = services.UseSlackNotificationsSenderViaAzureQueue(new AzureQueueSettings
@@ -93,26 +92,6 @@ namespace Lykke.MarketProfileService.Api
             ApplicationContainer = builder.Build();
 
             return new AutofacServiceProvider(ApplicationContainer);
-        }
-
-        private static ApplicationSettings LoadSettings()
-        {
-            var settingsUrl = Environment.GetEnvironmentVariable("SettingsUrl");
-
-            if (string.IsNullOrEmpty(settingsUrl))
-            {
-                throw new Exception("HostingEnvironment variable 'SettingsUrl' is not defined");
-            }
-
-            using (var httpClient = new HttpClient())
-            {
-                using (var response = httpClient.GetAsync(settingsUrl).Result)
-                {
-                    var settingsData = response.Content.ReadAsStringAsync().Result;
-
-                    return SettingsProcessor.Process<ApplicationSettings>(settingsData);
-                }
-            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

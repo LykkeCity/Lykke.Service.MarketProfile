@@ -49,7 +49,7 @@ namespace Lykke.MarketProfileService.Services
                         ExchangeName = _settings.QuoteFeedRabbitSettings.ExchangeName
                     })
                     .SetMessageDeserializer(new JsonMessageDeserializer<Quote>())
-                    .SetMessageReadStrategy(new MessageReadWithTransientAutodeleteQueueStrategy())
+                    .SetMessageReadStrategy(new MessageReadWithTemporaryQueueStrategy())
                     .Subscribe(ProcessQuote)
                     .SetLogger(_log)
                     .Start();
