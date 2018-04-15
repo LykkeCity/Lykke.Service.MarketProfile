@@ -1,0 +1,13 @@
+{
+    "MarketProfileService": {
+      "Db": {
+        "CachePersistenceConnectionString": "${MarketProfileDbConnectionString}",
+        "LogsConnectionString": "${MarketProfileDbLogsConnectionString}"
+      },
+      "QuoteFeedRabbitSettings": {
+        "ConnectionString": "${MarketProfileQuoteFeedRabbitMqConnString}",
+        "ExchangeName": "${MarketProfileQuoteFeedRabbitMqExchangeName}"
+      },
+      "CacheSettings": { "PersistPeriod": "${MarketProfileCachePersistPeriod}" }
+    }
+  }
