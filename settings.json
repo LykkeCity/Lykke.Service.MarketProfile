@@ -1,5 +1,5 @@
 {
-    "MarketProfileService2222": {
+    "MarketProfileService": {
       "Db": {
         "CachePersistenceConnectionString": "${MarketProfileDbConnectionString}",
         "LogsConnectionString": "${MarketProfileDbLogsConnectionString}"
