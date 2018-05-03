@@ -3,12 +3,12 @@
   {
     "Db": 
     {
-      "CachePersistenceConnectionString": "DefaultEndpointsProtocol=https;AccountName=lkedevmarketprofile;AccountKey=0biux0pzZFdunmBg01PCkL6Ma4XK03drKhQ8nxIVm20Svf62w9ZQrr2cFOVxT2KyhEjNpIfAmPCuBnZACdBuSA==",
+      "CachePersistenceConnectionString": "${lkedevmarketprofileconnstring}",
       "LogsConnectionString": "${MarketProfileDbLogsConnectionString}"
     },
     "QuoteFeedRabbitSettings": 
     {
-      "ConnectionString": "amqp://lykke.history:lykke.history@rabbit-spotprices.lykke-spotprices.svc.cluster.local:5672",
+      "ConnectionString": "${rabbit-spotprices}",
       "ExchangeName": "lykke.quotefeed"
     },
     "CacheSettings": 
@@ -20,7 +20,7 @@
   {
     "AzureQueue": 
     {
-      "ConnectionString": "DefaultEndpointsProtocol=https;AccountName=lkedevshared;AccountKey=deMBXlOj0telRE7poKY+2P9MwPcSsOJ+1IUqG6xoQ3kdDAMhxzvh22zKAXnlaKyPeF0gpbzgK4k7M9ZLdlTx+w==",
+      "ConnectionString": "${lkedevsharedconnstring}",
       "QueueName": "slack-notifications"
     },
     "ThrottlingLimitSeconds": 60
