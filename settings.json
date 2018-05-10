@@ -23,6 +23,6 @@
       "ConnectionString": "${SlackConnString}",
       "QueueName": "${SlackQueueName}"
     },
-    "ThrottlingLimitSeconds": "${SlackThrottlingLimitSeconds}
+    "ThrottlingLimitSeconds": "${SlackThrottlingLimitSeconds}"
   }
 }
