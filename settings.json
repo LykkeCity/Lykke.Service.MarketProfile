@@ -3,26 +3,26 @@
   {
     "Db": 
     {
-      "CachePersistenceConnectionString": "${lkedevmarketprofileconnstring}",
-      "LogsConnectionString": "${MarketProfileDbLogsConnectionString}"
+      "CachePersistenceConnectionString": "${MarketProfileServiceCachePersistenceConnStr}:[AzureTableStorage]",
+      "LogsConnectionString": "${MarketProfileServiceLoggsConnStr}:[Logs, AzureTableStorage]"
     },
     "QuoteFeedRabbitSettings": 
     {
-      "ConnectionString": "${rabbit-spotprices}",
-      "ExchangeName": "lykke.quotefeed"
+      "ConnectionString": "${MarketProfileServiceRabbitConnStr}:[RabbitMQ]",
+      "ExchangeName": "${MarketProfileServiceRabbitExchangeName}:[Name]"
     },
     "CacheSettings": 
     {
-      "PersistPeriod": "00:01:00"
+      "PersistPeriod": "${MarketProfileServiceCachePersistPeriod}:[Timestamp]"
     }
   },
   "SlackNotifications": 
   {
     "AzureQueue": 
     {
-      "ConnectionString": "${lkedevsharedconnstring}",
-      "QueueName": "slack-notifications"
+      "ConnectionString": "${SlackConnString}:[AzureTableStorage]",
+      "QueueName": "${SlackQueueName}:[Name]"
     },
-    "ThrottlingLimitSeconds": 60
+    "ThrottlingLimitSeconds": "${SlackThrottlingLimitSeconds}:[Timestamp]"
   }
 }
