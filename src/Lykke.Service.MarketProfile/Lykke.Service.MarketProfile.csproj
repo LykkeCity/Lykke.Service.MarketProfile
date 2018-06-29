@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp1.1\Lykke.Service.MarketProfile.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netcoreapp2.1\Lykke.Service.MarketProfile.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp1.1\Lykke.Service.MarketProfile.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp2.1\Lykke.Service.MarketProfile.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
   </PropertyGroup>
 
@@ -20,16 +20,14 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.0" />
     <PackageReference Include="Flurl.Http" Version="1.1.2" />
     <PackageReference Include="Lykke.AzureQueueIntegration" Version="2.1.0" />
-    <PackageReference Include="Lykke.Common.ApiLibrary" Version="1.0.7" />
+    <PackageReference Include="Lykke.Common.ApiLibrary" Version="1.7.1" />
     <PackageReference Include="Lykke.Domain.Prices" Version="0.9.11" />
     <PackageReference Include="Lykke.Logs" Version="4.3.4" />
     <PackageReference Include="Lykke.SlackNotification.AzureQueue" Version="2.0.5" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.1.1" />
-    <PackageReference Include="Swashbuckle.SwaggerGen" Version="6.0.0-beta902" />
-    <PackageReference Include="Swashbuckle.SwaggerUi" Version="6.0.0-beta902" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
   </ItemGroup>
 
   <ItemGroup>
