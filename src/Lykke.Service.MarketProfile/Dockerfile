@@ -1,4 +1,4 @@
-FROM microsoft/aspnetcore:1.1.1
+FROM microsoft/dotnet:2.1-aspnetcore-runtime
 WORKDIR /app
 COPY . .
 ENTRYPOINT ["dotnet", "Lykke.Service.MarketProfile.dll"]
