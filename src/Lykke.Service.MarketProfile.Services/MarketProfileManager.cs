@@ -17,7 +17,8 @@ namespace Lykke.Service.MarketProfile.Services
         IDisposable
     {
         private readonly ILog _log;
-        private readonly ApplicationSettings.MarketProfileServiceSettings _settings;
+        private readonly RabbitMqSubscriptionSettings _rabbitMqSubscriptionSettings;
+        private readonly TimeSpan _cachePersistPeriod;
         private readonly IAssetPairsCacheService _cacheService;
         private readonly IAssetPairsRepository _repository;
 
@@ -26,12 +27,14 @@ namespace Lykke.Service.MarketProfile.Services
 
         public MarketProfileManager(
             ILog log,
-            ApplicationSettings.MarketProfileServiceSettings settings,
+            RabbitMqSubscriptionSettings rabbitMqSubscriptionSettings,
+            TimeSpan cachePersistPeriod,
             IAssetPairsCacheService cacheService,
             IAssetPairsRepository repository)
         {
             _log = log;
-            _settings = settings;
+            _rabbitMqSubscriptionSettings = rabbitMqSubscriptionSettings;
+            _cachePersistPeriod = cachePersistPeriod;
             _cacheService = cacheService;
             _repository = repository;
         }
@@ -42,21 +45,14 @@ namespace Lykke.Service.MarketProfile.Services
             {
                 UpdateCache().Wait();
 
-                var settings = new RabbitMqSubscriptionSettings
-                {
-                    ConnectionString = _settings.QuoteFeedRabbitSettings.ConnectionString,
-                    QueueName = $"{_settings.QuoteFeedRabbitSettings.ExchangeName}.marketprofileservice",
-                    ExchangeName = _settings.QuoteFeedRabbitSettings.ExchangeName
-                };
-
-                _subscriber = new RabbitMqSubscriber<IQuote>(settings, new DefaultErrorHandlingStrategy(_log, settings))
+                _subscriber = new RabbitMqSubscriber<IQuote>(_rabbitMqSubscriptionSettings, new DefaultErrorHandlingStrategy(_log, _rabbitMqSubscriptionSettings))
                     .SetMessageDeserializer(new JsonMessageDeserializer<Quote>())
                     .SetMessageReadStrategy(new MessageReadWithTemporaryQueueStrategy())
                     .Subscribe(ProcessQuote)
                     .SetLogger(_log)
                     .Start();
 
-                _timer = new Timer(PersistCache, null, _settings.CacheSettings.PersistPeriod, Timeout.InfiniteTimeSpan);
+                _timer = new Timer(PersistCache, null, _cachePersistPeriod, Timeout.InfiniteTimeSpan);
             }
             catch (Exception ex)
             {
@@ -81,7 +77,7 @@ namespace Lykke.Service.MarketProfile.Services
             }
             finally
             {
-                _timer.Change(_settings.CacheSettings.PersistPeriod, Timeout.InfiniteTimeSpan);
+                _timer.Change(_cachePersistPeriod, Timeout.InfiniteTimeSpan);
             }
         }
 

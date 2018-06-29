@@ -1,12 +1,13 @@
 ﻿using System;
+using JetBrains.Annotations;
+using Lykke.Sdk.Settings;
 
-namespace Lykke.Service.MarketProfile.Core
+namespace Lykke.Service.MarketProfile.Settings
 {
-    public class ApplicationSettings
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+    public class AppSettings : BaseAppSettings
     {
         public MarketProfileServiceSettings MarketProfileService { get; set; }
-
-        public SlackNotificationsSettings SlackNotifications { get; set; }
 
         public class MarketProfileServiceSettings
         {
