@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Lykke.Service.MarketProfile
 {
@@ -72,7 +71,7 @@ namespace Lykke.Service.MarketProfile
             aggregateLogger.AddLog(consoleLogger);
 
             // Creating slack notification service, which logs own azure queue processing messages to aggregate log
-            var slackService = services.UseSlackNotificationsSenderViaAzureQueue(new AzureQueueIntegration.AzureQueueSettings
+            var slackService = services.UseSlackNotificationsSenderViaAzureQueue(new AzureQueueSettings
             {
                 ConnectionString = settings.CurrentValue.SlackNotifications.AzureQueue.ConnectionString,
                 QueueName = settings.CurrentValue.SlackNotifications.AzureQueue.QueueName
@@ -104,11 +103,8 @@ namespace Lykke.Service.MarketProfile
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
             app.UseLykkeMiddleware(Constants.ComponentName, ex => new ErrorModel
             {
                 Code = ErrorCode.RuntimeProblem,
@@ -116,8 +112,19 @@ namespace Lykke.Service.MarketProfile
             });
 
             app.UseMvc();
-            app.UseSwagger();
-            app.UseSwaggerUi();
+
+            app.UseStaticFiles();
+
+            app.UseSwagger(c =>
+            {
+                c.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
+            });
+            app.UseSwaggerUI(x =>
+            {
+                x.RoutePrefix = "swagger/ui";
+                x.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+            });
+
         }
     }
 }

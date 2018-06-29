@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 using Common.Log;
 using Lykke.Domain.Prices.Contracts;
 using Lykke.Domain.Prices.Model;
+using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.MarketProfile.Core;
 using Lykke.Service.MarketProfile.Core.Domain;
 using Lykke.Service.MarketProfile.Core.Services;
-using Lykke.Service.MarketProfile.Services.RabbitMq;
 
 namespace Lykke.Service.MarketProfile.Services
 {
@@ -42,12 +42,14 @@ namespace Lykke.Service.MarketProfile.Services
             {
                 UpdateCache().Wait();
 
-                _subscriber = new RabbitMqSubscriber<IQuote>(new RabbitMqSubscriberSettings
-                    {
-                        ConnectionString = _settings.QuoteFeedRabbitSettings.ConnectionString,
-                        QueueName = $"{_settings.QuoteFeedRabbitSettings.ExchangeName}.marketprofileservice",
-                        ExchangeName = _settings.QuoteFeedRabbitSettings.ExchangeName
-                    })
+                var settings = new RabbitMqSubscriptionSettings
+                {
+                    ConnectionString = _settings.QuoteFeedRabbitSettings.ConnectionString,
+                    QueueName = $"{_settings.QuoteFeedRabbitSettings.ExchangeName}.marketprofileservice",
+                    ExchangeName = _settings.QuoteFeedRabbitSettings.ExchangeName
+                };
+
+                _subscriber = new RabbitMqSubscriber<IQuote>(settings, new DefaultErrorHandlingStrategy(_log, settings))
                     .SetMessageDeserializer(new JsonMessageDeserializer<Quote>())
                     .SetMessageReadStrategy(new MessageReadWithTemporaryQueueStrategy())
                     .Subscribe(ProcessQuote)

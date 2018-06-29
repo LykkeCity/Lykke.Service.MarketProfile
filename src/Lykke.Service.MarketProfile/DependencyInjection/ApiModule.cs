@@ -29,7 +29,7 @@ namespace Lykke.Service.MarketProfile.DependencyInjection
 
             builder.Register<IAssetPairsRepository>(
                 x => new AssetPairRepository(AzureBlobStorage.Create(_appSettings.ConnectionString(o => o.MarketProfileService.Db.CachePersistenceConnectionString)),
-                        "AssetPairs",
+                        "assetpairs",
                         "Instance"));
 
             builder.RegisterType<AssetPairsCacheService>().As<IAssetPairsCacheService>();
