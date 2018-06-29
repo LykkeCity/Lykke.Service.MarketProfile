@@ -6,17 +6,18 @@ using Lykke.Service.MarketProfile.Core.Domain;
 using Lykke.Service.MarketProfile.Core.Services;
 using Lykke.Service.MarketProfile.Repositories;
 using Lykke.Service.MarketProfile.Services;
+using Lykke.SettingsReader;
 
 namespace Lykke.Service.MarketProfile.DependencyInjection
 {
     public class ApiModule : Module
     {
-        private readonly ApplicationSettings.MarketProfileServiceSettings _settings;
+        private readonly IReloadingManager<ApplicationSettings> _appSettings;
         private readonly ILog _log;
 
-        public ApiModule(ApplicationSettings.MarketProfileServiceSettings settings, ILog log)
+        public ApiModule(IReloadingManager<ApplicationSettings> appSettings, ILog log)
         {
-            _settings = settings;
+            _appSettings = appSettings;
             _log = log;
         }
 
@@ -24,11 +25,10 @@ namespace Lykke.Service.MarketProfile.DependencyInjection
         {
             builder.RegisterInstance(_log).SingleInstance();
 
-            builder.RegisterInstance(_settings).SingleInstance();
+            builder.RegisterInstance(_appSettings.CurrentValue.MarketProfileService).SingleInstance();
 
             builder.Register<IAssetPairsRepository>(
-                x => new AssetPairRepository(
-                        new AzureBlobStorage(_settings.Db.CachePersistenceConnectionString),
+                x => new AssetPairRepository(AzureBlobStorage.Create(_appSettings.ConnectionString(o => o.MarketProfileService.Db.CachePersistenceConnectionString)),
                         "AssetPairs",
                         "Instance"));
 
