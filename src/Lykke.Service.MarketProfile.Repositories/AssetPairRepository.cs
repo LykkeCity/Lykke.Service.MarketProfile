@@ -24,7 +24,7 @@ namespace Lykke.Service.MarketProfile.Repositories
 
         public async Task<IEnumerable<IAssetPair>> Read()
         {
-            if (_storage.HasBlobAsync(_container, _key).Result)
+            if (await _storage.HasBlobAsync(_container, _key))
             {
                 var data = await _storage.GetAsync(_container, _key);
                 var content = Encoding.UTF8.GetString(data.ToBytes());
