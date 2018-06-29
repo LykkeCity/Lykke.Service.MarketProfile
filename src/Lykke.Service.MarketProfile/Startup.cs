@@ -29,9 +29,8 @@ namespace Lykke.Service.MarketProfile
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
+
             Configuration = builder.Build();
 
             HostingEnvironment = env;
@@ -53,12 +52,11 @@ namespace Lykke.Service.MarketProfile
                 options.DefaultLykkeConfiguration("v1", "Lykke Market Profile");
             });
 
-            var settings = HttpSettingsLoader.Load<ApplicationSettings>();
-            var log = CreateLog(services, settings);
-            var appSettings = settings.MarketProfileService;
+            var settings = Configuration.LoadSettings<ApplicationSettings>();
+            var log = CreateLogWithSlack(services, settings);
             var builder = new ContainerBuilder();
 
-            builder.RegisterModule(new ApiModule(appSettings, log));
+            builder.RegisterModule(new ApiModule(settings, log));
             builder.Populate(services);
 
             ApplicationContainer = builder.Build();
@@ -66,35 +64,43 @@ namespace Lykke.Service.MarketProfile
             return new AutofacServiceProvider(ApplicationContainer);
         }
 
-        private static ILog CreateLog(IServiceCollection services, ApplicationSettings settings)
+        private static ILog CreateLogWithSlack(IServiceCollection services, IReloadingManager<ApplicationSettings> settings)
         {
-            var appSettings = settings.MarketProfileService;
+            var consoleLogger = new LogToConsole();
+            var aggregateLogger = new AggregateLogger();
 
-            LykkeLogToAzureStorage logToAzureStorage = null;
-            var logToConsole = new LogToConsole();
-            var logAggregate = new LogAggregate();
+            aggregateLogger.AddLog(consoleLogger);
 
-            logAggregate.AddLogger(logToConsole);
-
-            if (!string.IsNullOrEmpty(appSettings.Db.LogsConnectionString) &&
-                !(appSettings.Db.LogsConnectionString.StartsWith("${") && appSettings.Db.LogsConnectionString.EndsWith("}")))
+            // Creating slack notification service, which logs own azure queue processing messages to aggregate log
+            var slackService = services.UseSlackNotificationsSenderViaAzureQueue(new AzureQueueIntegration.AzureQueueSettings
             {
-                logToAzureStorage = new LykkeLogToAzureStorage("Lykke.Service.MarketProfile", new AzureTableStorage<LogEntity>(
-                    appSettings.Db.LogsConnectionString, "MarketProfileService", logToConsole));
+                ConnectionString = settings.CurrentValue.SlackNotifications.AzureQueue.ConnectionString,
+                QueueName = settings.CurrentValue.SlackNotifications.AzureQueue.QueueName
+            }, aggregateLogger);
 
-                logAggregate.AddLogger(logToAzureStorage);
+            var dbLogConnectionStringManager = settings.Nested(x => x.MarketProfileService.Db.LogsConnectionString);
+            var dbLogConnectionString = dbLogConnectionStringManager.CurrentValue;
+
+            // Creating azure storage logger, which logs own messages to console log
+            if (!string.IsNullOrEmpty(dbLogConnectionString) && !(dbLogConnectionString.StartsWith("${") && dbLogConnectionString.EndsWith("}")))
+            {
+                var persistenceManager = new LykkeLogToAzureStoragePersistenceManager(
+                    AzureTableStorage<LogEntity>.Create(dbLogConnectionStringManager, "MarketProfileService", consoleLogger),
+                    consoleLogger);
+
+                var slackNotificationsManager = new LykkeLogToAzureSlackNotificationsManager(slackService, consoleLogger);
+
+                var azureStorageLogger = new LykkeLogToAzureStorage(
+                    persistenceManager,
+                    slackNotificationsManager,
+                    consoleLogger);
+
+                azureStorageLogger.Start();
+
+                aggregateLogger.AddLog(azureStorageLogger);
             }
 
-            var log = logAggregate.CreateLogger();
-
-            var slackService = services.UseSlackNotificationsSenderViaAzureQueue(new AzureQueueSettings
-            {
-                ConnectionString = settings.SlackNotifications.AzureQueue.ConnectionString,
-                QueueName = settings.SlackNotifications.AzureQueue.QueueName
-            }, log);
-
-            logToAzureStorage?.SetSlackNotification(slackService);
-            return log;
+            return aggregateLogger;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
