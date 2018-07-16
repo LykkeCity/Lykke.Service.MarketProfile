@@ -1,0 +1,28 @@
+{
+  "MarketProfileService": 
+  {
+    "Db": 
+    {
+      "CachePersistenceConnectionString": "${MarketProfileServiceCachePersistenceConnStr}:[AzureTableStorage]",
+      "LogsConnectionString": "${MarketProfileServiceLoggsConnStr}:[Logs, AzureTableStorage]"
+    },
+    "QuoteFeedRabbitSettings": 
+    {
+      "ConnectionString": "${MarketProfileServiceRabbitConnStr}:[RabbitMQ]",
+      "ExchangeName": "${MarketProfileServiceRabbitExchangeName}:[Name]"
+    },
+    "CacheSettings": 
+    {
+      "PersistPeriod": "${MarketProfileServiceCachePersistPeriod}:[Timestamp]"
+    }
+  },
+  "SlackNotifications": 
+  {
+    "AzureQueue": 
+    {
+      "ConnectionString": "${SlackConnString}:[AzureTableStorage]",
+      "QueueName": "${SlackQueueName}:[Name]"
+    },
+    "ThrottlingLimitSeconds": "${SlackThrottlingLimitSeconds}:[Timestamp]"
+  }
+}
