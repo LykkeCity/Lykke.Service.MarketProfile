@@ -16,15 +16,24 @@ namespace Lykke.Service.MarketProfile
         {
             return services.BuildServiceProvider<AppSettings>(options =>
             {
-                options.ApiTitle = "Lykke Market Profile";
-                options.Logs = ("MarketProfileService", ctx => ctx.MarketProfileService.Db.LogsConnectionString);
+                options.SwaggerOptions = new LykkeSwaggerOptions
+                {
+                    ApiTitle = "Lykke Market Profile",
+                    ApiVersion = "v1",
+                };
+
+                options.Logs = logs =>
+                {
+                    logs.AzureTableName = "MarketProfileService";
+                    logs.AzureTableConnectionStringResolver = s => s.MarketProfileService.Db.LogsConnectionString;
+                };
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseLykkeMiddleware(Constants.ComponentName, ex => new ErrorModel
+            app.UseLykkeMiddleware(ex => new ErrorModel
             {
                 Code = ErrorCode.RuntimeProblem,
                 Message = "Technical problem"
