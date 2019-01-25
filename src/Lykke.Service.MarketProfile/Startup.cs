@@ -33,7 +33,7 @@ namespace Lykke.Service.MarketProfile
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseLykkeMiddleware(Constants.ComponentName, ex => new ErrorModel
+            app.UseLykkeMiddleware(ex => new ErrorModel
             {
                 Code = ErrorCode.RuntimeProblem,
                 Message = "Technical problem"
