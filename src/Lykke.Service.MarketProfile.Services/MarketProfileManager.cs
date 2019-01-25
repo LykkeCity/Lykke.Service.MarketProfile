@@ -43,7 +43,7 @@ namespace Lykke.Service.MarketProfile.Services
         {
             try
             {
-                UpdateCache().Wait();
+                UpdateCacheAsync().GetAwaiter().GetResult();
 
                 _subscriber = new RabbitMqSubscriber<IQuote>(_rabbitMqSubscriptionSettings, new DefaultErrorHandlingStrategy(_log, _rabbitMqSubscriptionSettings))
                     .SetMessageDeserializer(new JsonMessageDeserializer<Quote>())
@@ -56,7 +56,7 @@ namespace Lykke.Service.MarketProfile.Services
             }
             catch (Exception ex)
             {
-                _log.WriteErrorAsync(Constants.ComponentName, null, null, ex).Wait();
+                _log.WriteError(Constants.ComponentName, null, ex);
                 throw;
             }
         }
@@ -73,7 +73,7 @@ namespace Lykke.Service.MarketProfile.Services
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(Constants.ComponentName, null, null, ex);
+                _log.WriteError(Constants.ComponentName, null, ex);
             }
             finally
             {
@@ -81,14 +81,14 @@ namespace Lykke.Service.MarketProfile.Services
             }
         }
 
-        private async Task UpdateCache()
+        private async Task UpdateCacheAsync()
         {
             var pairs = await _repository.Read();
 
             _cacheService.InitCache(pairs);
         }
 
-        private async Task ProcessQuote(IQuote entry)
+        private Task ProcessQuote(IQuote entry)
         {
             try
             {
@@ -96,8 +96,10 @@ namespace Lykke.Service.MarketProfile.Services
             }
             catch (Exception ex)
             {
-                await _log.WriteErrorAsync(Constants.ComponentName, null, null, ex);
+                _log.WriteError(Constants.ComponentName, null, ex);
             }
+
+            return Task.CompletedTask;
         }
 
         public IAssetPair TryGetPair(string pairCode)
