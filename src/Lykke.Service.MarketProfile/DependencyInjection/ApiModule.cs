@@ -1,8 +1,6 @@
 ﻿using Autofac;
 using AzureStorage.Blob;
-using Common.Log;
 using Lykke.RabbitMqBroker.Subscriber;
-using Lykke.Service.MarketProfile.Core;
 using Lykke.Service.MarketProfile.Core.Domain;
 using Lykke.Service.MarketProfile.Core.Services;
 using Lykke.Service.MarketProfile.Repositories;
@@ -15,18 +13,14 @@ namespace Lykke.Service.MarketProfile.DependencyInjection
     public class ApiModule : Module
     {
         private readonly IReloadingManager<AppSettings> _appSettings;
-        private readonly ILog _log;
 
-        public ApiModule(IReloadingManager<AppSettings> appSettings, ILog log)
+        public ApiModule(IReloadingManager<AppSettings> appSettings)
         {
             _appSettings = appSettings;
-            _log = log;
         }
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterInstance(_log).SingleInstance();
-
             builder.Register<IAssetPairsRepository>(
                 x => new AssetPairRepository(AzureBlobStorage.Create(_appSettings.ConnectionString(o => o.MarketProfileService.Db.CachePersistenceConnectionString)),
                         "assetpairs",

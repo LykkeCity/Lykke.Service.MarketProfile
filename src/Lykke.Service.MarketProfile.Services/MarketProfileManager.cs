@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Log;
+using Lykke.Common.Log;
 using Lykke.Domain.Prices.Contracts;
 using Lykke.Domain.Prices.Model;
 using Lykke.RabbitMqBroker;
@@ -26,13 +27,13 @@ namespace Lykke.Service.MarketProfile.Services
         private Timer _timer;
 
         public MarketProfileManager(
-            ILog log,
+            ILogFactory logFactory,
             RabbitMqSubscriptionSettings rabbitMqSubscriptionSettings,
             TimeSpan cachePersistPeriod,
             IAssetPairsCacheService cacheService,
             IAssetPairsRepository repository)
         {
-            _log = log;
+            _log = logFactory.CreateLog(this);
             _rabbitMqSubscriptionSettings = rabbitMqSubscriptionSettings;
             _cachePersistPeriod = cachePersistPeriod;
             _cacheService = cacheService;
