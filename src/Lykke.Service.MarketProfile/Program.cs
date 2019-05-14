@@ -1,22 +1,17 @@
-﻿using System.IO;
-using Microsoft.AspNetCore.Hosting;
+﻿using System.Threading.Tasks;
+using Lykke.Sdk;
 
 namespace Lykke.Service.MarketProfile
 {
-    class Program
+    internal sealed class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .UseUrls("http://*:5000")
-                .UseStartup<Startup>()
-                .UseApplicationInsights()
-                .Build();
-
-            host.Run();
+#if DEBUG
+            await LykkeStarter.Start<Startup>(true);
+#else
+            await LykkeStarter.Start<Startup>(false);
+#endif
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Lykke.Service.MarketProfile.Core.Services;
 using Lykke.Service.MarketProfile.Models;
 using Lykke.Service.MarketProfile.Models.MarketProfile;
@@ -11,17 +12,17 @@ namespace Lykke.Service.MarketProfile.Controllers
     [Route("api/[controller]")]
     public class MarketProfileController : Controller
     {
-        private readonly IMarketProfileManager _manager;
+        private readonly IRedisService _redisService;
 
-        public MarketProfileController(IMarketProfileManager manager)
+        public MarketProfileController(IRedisService redisService)
         {
-            _manager = manager;
+            _redisService = redisService;
         }
 
         [HttpGet("")]
-        public IEnumerable<AssetPairModel> GetAll()
+        public async Task<IEnumerable<AssetPairModel>> GetAll()
         {
-            var pairs = _manager.GetAllPairs();
+            var pairs = await _redisService.GetMarketProfilesAsync();
 
             return pairs.Select(p => p.ToApiModel());
         }
@@ -30,7 +31,7 @@ namespace Lykke.Service.MarketProfile.Controllers
         [ProducesResponseType(typeof(AssetPairModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorModel), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorModel), (int)HttpStatusCode.BadRequest)]
-        public IActionResult Get(string pairCode)
+        public async Task<IActionResult> Get(string pairCode)
         {
             if (string.IsNullOrWhiteSpace(pairCode))
             {
@@ -41,7 +42,7 @@ namespace Lykke.Service.MarketProfile.Controllers
                 });
             }
 
-            var pair = _manager.TryGetPair(pairCode);
+            var pair = await _redisService.GetMarketProfileAsync(pairCode);
 
             if (pair == null)
             {
