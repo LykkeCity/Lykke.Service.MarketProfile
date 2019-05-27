@@ -44,7 +44,7 @@ namespace Lykke.Service.MarketProfile.Services
 
         private async Task<List<string>> GetAssetPairs()
         {
-            var assetPairs = await _database.SortedSetRangeByScoreAsync(RedisKeys.GetAssetPairsKey(), 0, 0);
+            var assetPairs = await _database.SetMembersAsync(RedisKeys.GetAssetPairsKey());
             return assetPairs.Select(assetPair => (string) assetPair).ToList();
         }
     }
