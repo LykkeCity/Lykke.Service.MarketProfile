@@ -25,18 +25,24 @@ namespace Lykke.Service.MarketProfile.Services
 
             return data.Length == 0 ? null : data.ToAssetPairPrice();
         }
-        
+
         public async Task<List<AssetPairPrice>> GetMarketProfilesAsync()
         {
             var result = new List<AssetPairPrice>();
             List<string> assetPairs = await GetAssetPairs();
+            var tasks = new List<Task<AssetPairPrice>>();
 
             foreach (string assetPair in assetPairs)
             {
-                var marketProfile = await GetMarketProfileAsync(assetPair);
+                tasks.Add(GetMarketProfileAsync(assetPair));
+            }
 
-                if (marketProfile != null)
-                    result.Add(marketProfile);
+            await Task.WhenAll(tasks);
+
+            foreach (var task in tasks)
+            {
+                if (task.Result != null)
+                    result.Add(task.Result);
             }
 
             return result;
